@@ -1,0 +1,84 @@
+:root {
+  --bg: #0b0f14;
+  --card: #121820;
+  --text: #e6edf3;
+  --muted: #9aa7b2;
+  --accent: #2ea043;
+  --accent-ghost: #2ea04322;
+  --danger: #f85149;
+  --danger-hover: #da3633;
+  --border: #1f2a36;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+
+header, footer { padding: 20px; max-width: 960px; margin: 0 auto; }
+header h1 { margin: 0; font-size: 24px; }
+footer { color: var(--muted); }
+
+main { max-width: 960px; margin: 0 auto; padding: 20px; display: grid; gap: 20px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+}
+
+h2 { margin-top: 0; font-size: 18px; }
+
+.field { display: grid; gap: 6px; margin-bottom: 12px; }
+label { color: var(--muted); font-size: 14px; }
+input {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #0e141b;
+  color: var(--text);
+  width: 100%;
+}
+
+button {
+  background: var(--accent);
+  color: #06220f;
+  border: none;
+  padding: 10px 14px;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+}
+button:hover { filter: brightness(0.95); }
+
+button.danger {
+  background: var(--danger);
+  color: #fff;
+}
+button.danger:hover { background: var(--danger-hover); }
+
+.status { margin-left: 8px; color: var(--muted); }
+
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  text-align: left; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); padding: 10px 8px;
+}
+tbody td { padding: 10px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tbody tr:hover { background: #0e141b; }
+
+button.secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+button.secondary:hover { background: #0e141b; }
+
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+input.table-edit {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #0e141b;
+  color: var(--text);
+  width: 100%;
+}

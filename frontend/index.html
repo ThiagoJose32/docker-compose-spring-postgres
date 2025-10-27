@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <title>Foods • Frontend simples</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<header>
+    <h1>Foods</h1>
+</header>
+
+<main>
+    <section class="card">
+        <h2>Novo Food</h2>
+        <form id="food-form">
+            <div class="field">
+                <label for="name">Nome</label>
+                <input id="name" name="name" type="text" required />
+            </div>
+            <div class="field">
+                <label for="expirationDate">Validade</label>
+                <input id="expirationDate" name="expirationDate" type="date" required />
+            </div>
+            <div class="field">
+                <label for="quantity">Quantidade</label>
+                <input id="quantity" name="quantity" type="number" inputmode="numeric" min="0" step="1" required />
+            </div>
+            <button type="submit">Salvar</button>
+            <span id="form-status" class="status"></span>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>Lista</h2>
+        <div id="list-status" class="status"></div>
+        <table id="foods-table">
+            <thead>
+            <tr>
+                <th style="width: 80px;">ID</th>
+                <th>Nome</th>
+                <th>Validade</th>
+                <th>Quantidade</th>
+                <th style="width: 180px;">Ações</th>
+            </tr>
+            </thead>
+            <tbody id="foods-tbody"></tbody>
+        </table>
+    </section>
+</main>
+
+<footer>
+    <small>Frontend estático (Nginx) • Proxy para <code>/api</code> → <code>api_java_spring:8080</code></small>
+</footer>
+
+<script src="./app.js"></script>
+</body>
+</html>

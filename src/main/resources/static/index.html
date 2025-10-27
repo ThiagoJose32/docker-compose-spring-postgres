@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+
+    <style>
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .container{
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        button, input {
+            padding: 8px;
+            margin: 5px 0;
+        }
+        .result-box{
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            min-height: 20px;
+        }
+    </style>
+
+</head>
+    <body>
+        <div class="container">
+            <h1>Integração - Front-end e Back-end</h1>
+
+            <!-- GET -->
+            <button onclick="">Buscar Mensagem</button>
+            <div id="resultado-get" class="result-box"></div>
+
+            <!-- POST -->
+            <input type="text" id="dados-input">
+            <button onclick="">Enviar</button>
+            <div id="resultado-post" class="result-box"></div>
+        </div>
+
+        <script src="/js/app.js"></script>
+    </body>
+</html>

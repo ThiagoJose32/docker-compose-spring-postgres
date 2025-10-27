@@ -17,8 +17,17 @@ public class FoodController {
     }
 
     @GetMapping
-    public List<Food> getAll() {return foodService.getAll();}
+    public List<Food> getAll() { return foodService.getAll(); }
 
     @PostMapping
-    public Food create (@RequestBody Food food) {return foodService.save(food);}
+    public Food create (@RequestBody Food food) { return foodService.save(food); }
+
+    @DeleteMapping("/{id}")
+    public void delete (@PathVariable Long id) { foodService.delete(id); }
+
+    // === NOVO: PATCH parcial ===
+    @PatchMapping("/{id}")
+    public Food patch(@PathVariable Long id, @RequestBody Food partial) {
+        return foodService.updatePartial(id, partial);
+    }
 }
