@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  api_java_spring:
+    build: .
+    container_name: api_java_spring
+    ports:
+      - "3000:8080"  # Porta do host 3000 para porta do container 8080
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db_postgres:5432/${POSTGRES_NAME}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_PROFILES_ACTIVE: prod
+    networks:
+      - public_network
+      - private_network
+    depends_on:
+      db_postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db_postgres:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_NAME}
+    ports:
+      - "35432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - private_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  private_network:
+    driver: bridge
+  public_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
