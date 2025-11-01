@@ -1,66 +1,95 @@
+# Versão do Docker Compose
 version: '3.8'
 
+# Definir os serviços
 services:
-  postgres_db:
-    image: postgres:15-alpine
-    container_name: postgres_db
-    env_file:
-      - .env
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-    networks:
-      - private_network
-
+  # Serviço da API
   api_java_spring:
     build: .
+    # Nome para o container
     container_name: api_java_spring
-    env_file:
-      - .env
+    # Mapear a porta 8080 do container para a porta 8080 do host
     ports:
       - "8080:8080"
-    depends_on:
-      - postgres_db
-    restart: unless-stopped
+    # Definir variáveis de ambiente
+    env_file:
+      - .env
+    # Conectar a rede personalizada
     networks:
       - public_network
       - private_network
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Serviço do banco de dados PostgreSQL
+  postgres_db:
+    image: postgres:15-alpine
+    # Container name
+    container_name: postgres_db
+    # Variaveis de ambiente
+    env_file:
+      - .env
+    # Mapear a porta 5432 do container para a porta 35432 do host
+    ports:
+      - "35432:5432"
+    # Volume para persistência de dados
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # Conectar a rede personalizada
+    networks:
+      - private_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
 
   pgadmin:
     image: dpage/pgadmin4:latest
+    # Container name
     container_name: pgadmin
+    # Variaveis de ambiente
     env_file:
       - .env
+    # Mapear a porta 80 do container para a porta 5050 do host
     ports:
       - "5050:80"
     depends_on:
       - postgres_db
     restart: unless-stopped
+    # Volume para persistência de dados
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+    # Conectar a rede personalizada
     networks:
       - private_network
 
+  # Frontend (Web client)
   frontend:
     build: ./frontend
+    # Container name
     container_name: frontend
+    # Mapear a porta 80 do container para a porta 3000 do host
     ports:
       - "3000:80"
     depends_on:
       - api_java_spring
+    # Conectar a rede personalizada
     networks:
       - public_network
 
 
+# Network definitions
 networks:
   private_network:
     driver: bridge
   public_network:
     driver: bridge
 
-
+# Persistent storage volumes
 volumes:
   postgres_data:
   pgadmin_data:
