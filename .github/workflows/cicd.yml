@@ -3,7 +3,7 @@ name: CI-CD
 on:
   push:
     branches:
-      - main  # Ajuste para sua branch principal, pode ser 'master' ou 'main'.
+      - main  # Ajuste para sua branch principal, pode ser 'master' ou 'main'
 
 jobs:
   build:
