@@ -79,3 +79,4 @@ jobs:
             docker compose up -d --build
             docker container prune -f
             docker image prune -f -a
+
