@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  api_java_spring:
+    image: "${DOCKERHUB_USERNAME}/springboot-api:${DOCKER_IMAGE_TAG}"
+    container_name: api_java_spring
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    networks:
+      - public_network
+      - private_network
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres_db:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    env_file:
+      - .env
+    ports:
+      - "35432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - private_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    env_file:
+      - .env
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres_db
+    restart: unless-stopped
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - private_network
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api_java_spring
+    networks:
+      - public_network
+
+networks:
+  private_network:
+    driver: bridge
+  public_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  pgadmin_data:

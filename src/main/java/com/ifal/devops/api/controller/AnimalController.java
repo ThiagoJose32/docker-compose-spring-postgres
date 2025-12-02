@@ -17,11 +17,29 @@ public class AnimalController {
     }
 
     @GetMapping
-    public List<Animal> getAll() {return animalService.getAll();}
+    public List<Animal> getAll() {
+        return animalService.getAll();
+    }
 
     @PostMapping
-    public Animal create (@RequestBody Animal animal) {return animalService.save(animal);}
+    public Animal create (@RequestBody Animal animal) {
+        return animalService.save(animal);
+    }
 
     @DeleteMapping("/{id}")
-    public void delete (@PathVariable Long id) {animalService.delete(id);}
+    public void delete (@PathVariable Long id) {
+        animalService.delete(id);
+    }
+
+    @GetMapping("/{id}")
+    public Animal getById(@PathVariable Long id) {
+        return animalService.getById(id);
+    }
+
+    @PutMapping("/{id}")
+    public Animal update(@PathVariable Long id, @RequestBody Animal animal) {
+        return animalService.update(id, animal);
+    }
+
+
 }
