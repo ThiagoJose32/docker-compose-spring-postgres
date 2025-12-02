@@ -54,9 +54,11 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Test SSH connection
+      - name: Save SSH private key
         run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.SSH_HOST }} "echo 'SSH connection successful!'"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@${{ secrets.SSH_HOST }} "echo 'SSH connection successful!'"
 
       - name: Copy docker-compose.prod.yml to server
         uses: appleboy/scp-action@v0.1.7
