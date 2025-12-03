@@ -34,7 +34,7 @@ services:
     # Mapear a porta 5432 do container para a porta 35432 do host
     ports:
       - "35432:5432"
-    # Volume para persistência de dados
+    # Volume para persistência de dados.
     volumes:
       - postgres_data:/var/lib/postgresql/data
     # Conectar a rede personalizada
