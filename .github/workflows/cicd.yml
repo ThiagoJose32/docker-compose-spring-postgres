@@ -54,29 +54,37 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      # (opcional) Teste de SSH, agora usando o mesmo usuário do secret
-      - name: Test SSH connection
+      # 1) Criar arquivo de chave privada a partir do secret
+      - name: Prepare SSH key file
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo 'SSH connection successful!'"
+          # desativa verificação de host para não travar no prompt
+          printf "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
 
+      # (opcional) Teste de SSH usando o mesmo usuário e host
+      - name: Test SSH connection
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo 'SSH connection successful from GitHub Actions!'"
+
+      # 2) Copiar docker-compose.prod.yml usando appleboy, mas com key_path
       - name: Copy docker-compose.prod.yml to server
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}          # <-- usa ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.SSH_HOST }}       # 54.207.191.95
+          username: ${{ secrets.SSH_USER }}   # ubuntu
+          key_path: ~/.ssh/id_rsa             # <-- EM VEZ DE "key:"
           source: "docker-compose.prod.yml"
-          target: "~"                               # copia para a home; o nome continua docker-compose.prod.yml
+          target: "~"                         # vai virar ~/docker-compose.prod.yml
 
+      # 3) Deploy via SSH usando appleboy com key_path
       - name: Deploy on server via SSH
         uses: appleboy/ssh-action@v0.1.3
         with:
           host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}          # <-- usa ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          username: ${{ secrets.SSH_USER }}
+          key_path: ~/.ssh/id_rsa             # <-- EM VEZ DE "key:"
           script: |
             cd ~
             echo "DB_USER=${{ secrets.DB_USER }}" > .env
@@ -84,6 +92,7 @@ jobs:
             echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
             echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
             echo "DOCKER_IMAGE_TAG=${{ needs.build.outputs.docker_tag }}" >> .env
+
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
             docker compose -f docker-compose.prod.yml up -d
             docker container prune -f
