@@ -54,31 +54,24 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      # (Opcional, mas bom pra testar a chave nova)
-      - name: Test SSH connection using raw ssh
+      - name: Criar arquivo da chave privada
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           printf "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo 'SSH OK from GitHub Actions!'"
 
-      - name: Copy docker-compose.prod.yml to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}        # 54.207.191.95
-          username: ${{ secrets.SSH_USER }}    # ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}  # <-- AGORA USANDO O SECRET DIRETO
-          source: "docker-compose.prod.yml"
-          target: "~"                          # vai virar ~/docker-compose.prod.yml
+      - name: Testar conexão SSH (usando mesma chave que você testou no PC)
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@54.207.191.95 "echo 'SSH OK from GitHub Actions!'"
 
-      - name: Deploy on server via SSH
-        uses: appleboy/ssh-action@v0.1.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}  # <-- TAMBÉM AQUI
-          script: |
+      - name: Copiar docker-compose.prod.yml para o servidor
+        run: |
+          scp -i ~/.ssh/id_rsa docker-compose.prod.yml ubuntu@54.207.191.95:~/docker-compose.prod.yml
+
+      - name: Executar deploy no servidor
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@54.207.191.95 << 'EOF'
             cd ~
             echo "DB_USER=${{ secrets.DB_USER }}" > .env
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
@@ -90,3 +83,4 @@ jobs:
             docker compose -f docker-compose.prod.yml up -d
             docker container prune -f
             docker image prune -f -a
+          EOF
