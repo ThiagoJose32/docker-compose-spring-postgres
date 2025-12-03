@@ -84,7 +84,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key_path: ~/.ssh/id_rsa             # <-- EM VEZ DE "key:"
+          key_path: ~/.ssh/id_rsa             # <-- EM VEZ DE "key:".
           script: |
             cd ~
             echo "DB_USER=${{ secrets.DB_USER }}" > .env
