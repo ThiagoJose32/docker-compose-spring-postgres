@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   api_java_spring:
-    image: "${DOCKERHUB_USERNAME}/springboot-api:${DOCKER_IMAGE_TAG}"
+    image: "${DOCKERHUB_USERNAME}/api_java_spring:${DOCKER_IMAGE_TAG}"
     container_name: api_java_spring
     ports:
       - "8080:8080"
