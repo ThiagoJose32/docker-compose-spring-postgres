@@ -54,37 +54,30 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      # 1) Criar arquivo de chave privada a partir do secret
-      - name: Prepare SSH key file
+      # (Opcional, mas bom pra testar a chave nova)
+      - name: Test SSH connection using raw ssh
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          # desativa verificação de host para não travar no prompt
           printf "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo 'SSH OK from GitHub Actions!'"
 
-      # (opcional) Teste de SSH usando o mesmo usuário e host
-      - name: Test SSH connection
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo 'SSH connection successful from GitHub Actions!'"
-
-      # 2) Copiar docker-compose.prod.yml usando appleboy, mas com key_path
       - name: Copy docker-compose.prod.yml to server
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.SSH_HOST }}       # 54.207.191.95
-          username: ${{ secrets.SSH_USER }}   # ubuntu
-          key_path: ~/.ssh/id_rsa             # <-- EM VEZ DE "key:"
+          host: ${{ secrets.SSH_HOST }}        # 54.207.191.95
+          username: ${{ secrets.SSH_USER }}    # ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # <-- AGORA USANDO O SECRET DIRETO
           source: "docker-compose.prod.yml"
-          target: "~"                         # vai virar ~/docker-compose.prod.yml
+          target: "~"                          # vai virar ~/docker-compose.prod.yml
 
-      # 3) Deploy via SSH usando appleboy com key_path
       - name: Deploy on server via SSH
         uses: appleboy/ssh-action@v0.1.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key_path: ~/.ssh/id_rsa             # <-- EM VEZ DE "key:".
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # <-- TAMBÉM AQUI
           script: |
             cd ~
             echo "DB_USER=${{ secrets.DB_USER }}" > .env
