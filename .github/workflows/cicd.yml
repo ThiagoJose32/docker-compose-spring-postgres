@@ -22,16 +22,15 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build with Maven
-        run: mvn clean package -DskipTests=true
-
       - name: Run Tests
         run: mvn test
 
+      - name: Build JAR
+        run: mvn clean package
+
       - name: Generate Tag from SHA
         id: generate_tag
-        run: |
-          echo "sha=$(echo $GITHUB_SHA | head -c7)" >> $GITHUB_OUTPUT
+        run: echo "sha=$(echo $GITHUB_SHA | head -c7)" >> $GITHUB_OUTPUT
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -51,9 +50,6 @@ jobs:
     needs: build
 
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
-
       - name: Criar arquivo da chave privada
         run: |
           mkdir -p ~/.ssh
@@ -61,26 +57,28 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           printf "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
 
-      - name: Testar conexão SSH (usando mesma chave que você testou no PC)
+      - name: Testar conexão SSH
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@54.207.191.95 "echo 'SSH OK from GitHub Actions!'"
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.SSH_HOST }} "echo 'SSH OK from GitHub Actions!'"
 
       - name: Copiar docker-compose.prod.yml para o servidor
         run: |
-          scp -i ~/.ssh/id_rsa docker-compose.prod.yml ubuntu@54.207.191.95:~/docker-compose.prod.yml
+          scp -i ~/.ssh/id_rsa docker-compose.prod.yml ubuntu@${{ secrets.SSH_HOST }}:~/docker-compose.prod.yml
 
       - name: Executar deploy no servidor
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@54.207.191.95 << 'EOF'
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.SSH_HOST }} << 'EOF'
             cd ~
-            echo "DB_USER=${{ secrets.DB_USER }}" > .env
+            rm -f .env
+            touch .env
+            echo "DB_USER=${{ secrets.DB_USER }}" >> .env
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
             echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
             echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
             echo "DOCKER_IMAGE_TAG=${{ needs.build.outputs.docker_tag }}" >> .env
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-            docker compose -f docker-compose.prod.yml up -d
+            docker compose -f docker-compose.prod.yml up -d --build
             docker container prune -f
             docker image prune -f -a
           EOF
