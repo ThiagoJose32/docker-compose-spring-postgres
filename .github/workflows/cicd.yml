@@ -50,6 +50,9 @@ jobs:
     needs: build
 
     steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
       - name: Criar arquivo da chave privada
         run: |
           mkdir -p ~/.ssh
