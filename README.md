@@ -65,6 +65,75 @@ Below are the services that make up the project environment:
 
 ---
 
+## CI/CD (Deploy)
+### Pipeline Status
+[![CI/CD Pipeline](https://github.com/ThiagoJose32/docker-compose-spring-postgres/actions/workflows/cicd.yml/badge.svg)](https://github.com/ThiagoJose32/docker-compose-spring-postgres/actions/workflows/cicd.yml)
+
+### Pipeline Description
+
+This project uses GitHub Actions to automate the Continuous Integration and Continuous Deployment (CI/CD) process.
+The pipeline is triggered automatically on every push to the main branch and performs the following steps:
+1. Checkout
+    - Downloads the repository source code.
+2. Java Setup
+    - Configures Java 21 using actions/setup-java.
+3. Build and Tests
+    - Runs Maven to compile the project.
+    - Executes automated tests to validate the application.
+4. Deploy
+    - Connects to the remote server using SSH.
+    - Updates the project source code.
+    - Rebuilds and restarts the containers using Docker Compose.
+
+This ensures that every change pushed to the main branch is automatically tested and deployed.
+
+### GitHub Secrets Configuration
+
+The following GitHub Secrets must be configured for the deploy to work:
+
+Path: `Settings > Secrets and variables > Actions`
+
+| Secret Name | Description |
+|----------|------|
+| `SERVER_HOST` | **Server IP address or domain** |
+| `SERVER_USER` | **SSH user on the server** |
+| `SERVER_SSH_KEY` | **Private SSH key used for authentication** |
+| `SERVER_PORT` | **SSH port (default: 22)** |
+
+### Manual Steps on the Server
+
+Before the first automated deploy, the following steps must be performed on the server.
+
+1. Access the server
+     
+```bash
+ssh user@SERVER_IP
+```
+2. Clone the repository
+```bash
+git clone https://github.com/ThiagoJose32/docker-compose-spring-postgres.git
+cd docker-compose-spring-postgres
+```
+3. Create the .env file
+```bash
+nano .env
+```
+
+Add the required environment variables as shown in the Project Setup section.
+
+4. Ensure Docker and Docker Compose are installed
+
+```bash
+docker --version
+docker compose version
+```
+5. First manual deploy (optional)
+```bash
+docker compose up -d --build
+```
+
+After these steps, all future deployments will be handled automatically by GitHub Actions.
+
 **Notes:**
 - All services are orchestrated with **Docker Compose**.
 - Networks and volumes are automatically configured when containers are started.
