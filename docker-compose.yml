@@ -67,19 +67,6 @@ services:
     networks:
       - private_network
 
-  # Frontend (Web client)
-  frontend:
-    build: ./frontend
-    # Container name
-    container_name: frontend
-    # Mapear a porta 80 do container para a porta 3000 do host
-    ports:
-      - "3000:80"
-    depends_on:
-      - api_java_spring
-    # Conectar a rede personalizada
-    networks:
-      - public_network
 
 
 # Network definitions

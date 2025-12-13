@@ -33,7 +33,6 @@ public class AnimalService {
     public Animal update(Long id, Animal animal) {
         Animal existing = animalRepository.findById(id).orElse(null);
         if (existing != null) {
-            // Atualize os campos necessários — um exemplo:
             existing.setNome(animal.getNome());
             existing.setFoto(animal.getFoto());
             existing.setSexo(animal.getSexo());
@@ -49,7 +48,7 @@ public class AnimalService {
 
             return animalRepository.save(existing);
         }
-        return null; // ou lançar exceção, conforme sua lógica
+        return null;
     }
 
 }

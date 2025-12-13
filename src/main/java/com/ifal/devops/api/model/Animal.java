@@ -32,7 +32,6 @@ public class Animal {
     public Animal() {
     }
 
-    // Se quiser manter o construtor completo:
     public Animal(Long id, String nome, String foto, Character sexo, String especie,
                   String raca, LocalDate dataNascimento, String descricao, Boolean castrado,
                   String status, String adotante, String criadoPor, LocalDate criadoEm,
@@ -54,7 +53,6 @@ public class Animal {
         this.modificadoEm = modificadoEm;
     }
 
-    // GETTERS e SETTERS
 
     public Long getId() {
         return id;

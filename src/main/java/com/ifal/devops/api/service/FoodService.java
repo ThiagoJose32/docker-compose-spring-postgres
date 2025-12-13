@@ -23,7 +23,6 @@ public class FoodService {
 
     public void delete(Long id) { foodRepository.deleteById(id); }
 
-    // === NOVO: atualização parcial ===
     public Food updatePartial(Long id, Food partial) {
         Food current = foodRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Food not found"));

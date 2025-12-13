@@ -49,16 +49,6 @@ services:
     networks:
       - private_network
 
-  frontend:
-    build: ./frontend
-    container_name: frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - api_java_spring
-    networks:
-      - public_network
-
 networks:
   private_network:
     driver: bridge

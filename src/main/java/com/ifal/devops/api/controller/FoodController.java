@@ -25,7 +25,6 @@ public class FoodController {
     @DeleteMapping("/{id}")
     public void delete (@PathVariable Long id) { foodService.delete(id); }
 
-    // === NOVO: PATCH parcial ===
     @PatchMapping("/{id}")
     public Food patch(@PathVariable Long id, @RequestBody Food partial) {
         return foodService.updatePartial(id, partial);
