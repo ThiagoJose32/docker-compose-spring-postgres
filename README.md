@@ -61,7 +61,6 @@ Below are the services that make up the project environment:
 | **Spring Boot API** | `8080` | Java backend API |
 | **PostgreSQL** | `35432` | Database (mapped to `5432` inside the container) |
 | **pgAdmin** | `5050` | Web interface for PostgreSQL database management |
-| **Frontend** | `3000` | Static web interface (HTML, CSS, JavaScript) |
 
 ---
 
